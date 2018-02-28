@@ -41,7 +41,7 @@ namespace mnist_classification
             OpenFileDialog fileDialog = new OpenFileDialog();
 
 
-            fileDialog.Filter = "Cfg Files (.cfg)|*.cfg|All Files (*.*)|*.*";
+            fileDialog.Filter = "cfg Files (.cfg)|*.cfg|All Files (*.*)|*.*";
 
             fileDialog.FilterIndex = 1;
 
