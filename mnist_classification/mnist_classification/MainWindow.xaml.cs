@@ -29,6 +29,8 @@ namespace mnist_classification
         {
             //Load cfg file
             Console.WriteLine("Pressed load cfg");
+
+            //Add the load file under here.
         }
 
         private void Load_weights_Click(object sender, RoutedEventArgs e)
