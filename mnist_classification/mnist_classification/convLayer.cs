@@ -30,6 +30,8 @@ namespace mnist_classification
 
         public Filter[] FilterArray { get; set; }
 
+        public double[] bias { get; set; }
+
 
         //Input and output is given as width times height times depth.
         public float[,,] Output { get; set; }

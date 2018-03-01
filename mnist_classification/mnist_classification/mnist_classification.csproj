@@ -65,6 +65,7 @@
     <Compile Include="ConvLayer.cs" />
     <Compile Include="FCLayer.cs" />
     <Compile Include="Filter.cs" />
+    <Compile Include="Layers.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
