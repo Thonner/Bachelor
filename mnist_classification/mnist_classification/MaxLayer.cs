@@ -40,15 +40,15 @@ namespace mnist_classification
 
             float[,] part = new float[Size, Size];
 
-            for (int k = 0; k < OutputDepth; k++)
+            for (int k = 0; k < InputDepth; k++)
             {
-                for (int i = 0; i < OutputWidth; i+=Stride)
+                for (int i = 0; i < InputWidth; i+=Stride)
                 {
-                    for (int j = 0; j < OutputHeight; j+=Stride)
+                    for (int j = 0; j < InputHeight; j+=Stride)
                     {
                         FillPart(part, i, j, k);
 
-                        Output[i, j, k] = Max(part);
+                        Output[i/Stride, j/Stride, k] = Max(part);
                     }
                 }
             }

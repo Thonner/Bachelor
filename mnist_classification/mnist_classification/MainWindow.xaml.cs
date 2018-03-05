@@ -356,14 +356,15 @@ namespace mnist_classification
                     path = fileDialog.FileName;
                     BinaryReader br = new BinaryReader(File.OpenRead(path));
 
-                    int major, minor, revision, seen;
-
+                    int major, minor, revision;
+                    long seen;
                     
                     layerCount = 0;
                     major = br.ReadInt32();
                     minor = br.ReadInt32();
                     revision = br.ReadInt32();
-                    seen = br.ReadInt32();
+                    seen = br.ReadInt64();
+
                     for (int i = 0; i < Layers.Count; i++)
                     {
 
@@ -374,6 +375,8 @@ namespace mnist_classification
                             {
                                 Layers[i].Conv.Bias[j] = br.ReadSingle();
                             }
+
+                            
                             // Write code that can determine wheter or not scales an
 
                             for (int filterNr = 0; filterNr < Layers[i].Conv.Filters; filterNr++)
@@ -556,6 +559,10 @@ namespace mnist_classification
 
 
 
+        }
+
+        private void Clear_pic_Button_Click(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

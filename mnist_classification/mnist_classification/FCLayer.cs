@@ -43,19 +43,18 @@ namespace mnist_classification
 
 
                 //For all the nodes in the input
-                for (int i = 0; i < InputWidth; i++)
+                for (int k = 0; k < InputDepth; k++)
                 {
                     for (int j = 0; j < InputHeight; j++)
                     {
-                        for (int k = 0; k < InputDepth; k++)
+                        for (int i = 0; i < InputWidth; i++)
                         {
                             Output[0,0,output] += WeightsArray[output,counter] * Input[i, j, k];
                             counter++;
                         }
-
-                        Output[0, 0, output] = Max(Output[0, 0, output], 0.0F);
                     }
                 }
+                Output[0, 0, output] = Max(Output[0, 0, output] + Bias[output], 0.0F);
             }
         }
 

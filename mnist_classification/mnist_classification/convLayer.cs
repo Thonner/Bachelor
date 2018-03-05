@@ -85,13 +85,13 @@ namespace mnist_classification
         {
             float sum = 0;
 
-            for(int i = 0; i< filter.Width; i++)
+            for(int i = 0; i< filter.Depth; i++)
             {
                 for(int j = 0; j < filter.Height; j++)
                 {
-                    for(int k = 0; k< filter.Depth; k++)
+                    for(int k = 0; k< filter.Width; k++)
                     {
-                        sum += filter.Weights[i, j, k] * part[i,j,k];
+                        sum += filter.Weights[k, j, i] * part[k,j,i];
                     }
                 }
             }
