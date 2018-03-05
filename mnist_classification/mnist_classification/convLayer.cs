@@ -30,7 +30,7 @@ namespace mnist_classification
 
         public Filter[] FilterArray { get; set; }
 
-        public double[] Bias { get; set; }
+        public float[] Bias { get; set; }
 
 
         //Input and output is given as width times height times depth.
@@ -57,7 +57,7 @@ namespace mnist_classification
                 for (int j = 0; j < InputHeight; j += Stride)
                 {
                     //Fill the part of the array that is to be calculated.
-                    FillPart(part, i, j);
+                    FillPart(part, i - Pad, j - Pad);
 
 
                     int depth = 0;
@@ -66,7 +66,7 @@ namespace mnist_classification
                     {
 
                         //Max for ReLu function.
-                        Output[i, j, depth] =  Max(MultFilter(filter, part),0);
+                        Output[i, j, depth] =  Max(MultFilter(filter, part) + Bias[depth],0);
 
 
                         depth++;
@@ -105,10 +105,26 @@ namespace mnist_classification
             {
                 for(int m = 0; m <FilterSize; m++)
                 {
-                    for(int k = 0; k < InputDepth; k++)
+                    for (int k = 0; k < InputDepth; k++)
                     {
+                        float temp = 0;
 
-                        part[n, m, k] = Input[n + i, m + j, k];
+                        if (n + i >= InputWidth) {
+                            temp = 0;
+                        }
+                        else if (m + j >= InputHeight)
+                        {
+                            temp = 0;
+                        }
+                        else if (n + i < 0 || m + j < 0) { temp = 0; }
+                        else
+                        {
+                            temp = Input[n + i, m + j, k];
+                        }
+
+
+                        part[n, m, k] = temp;
+
 
                     }
                 }

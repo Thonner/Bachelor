@@ -192,7 +192,7 @@ namespace mnist_classification
                                 {
                                     case "fil":
                                         Layers[layerCount - 1].Conv.Filters = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
-                                        Layers[layerCount - 1].Conv.Bias = new double[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
+                                        Layers[layerCount - 1].Conv.Bias = new float[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
                                         break;
 
                                     case "siz":
@@ -234,7 +234,7 @@ namespace mnist_classification
                                     Layers[layerCount - 1].Conv.FilterArray[i].Depth = Layers[layerCount - 1].Conv.InputDepth;
                                 }
                                 //Layers[layerCount - 1].Conv.FilterArray[i].Depth = ?? should be calculated from preveos layer
-                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new float[Layers[layerCount - 1].Conv.FilterArray[i].Depth, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Height];
+                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new float[Layers[layerCount - 1].Conv.FilterArray[i].Height, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Depth];
 
                             }
 
@@ -539,6 +539,17 @@ namespace mnist_classification
             }
 
 
+
+            StringBuilder builder = new StringBuilder();
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                builder.AppendFormat("{0}: {1}\n",i, Layers[Layers.Count - 1].FC.Output[0, 0, i]);
+            }
+
+
+            TextBoxResult.Text = builder.ToString();
 
 
 

@@ -52,11 +52,17 @@ namespace mnist_classification
                             Output[0,0,output] += WeightsArray[output,counter] * Input[i, j, k];
                             counter++;
                         }
+
+                        Output[0, 0, output] = Max(Output[0, 0, output], 0.0F);
                     }
                 }
             }
         }
 
-
+        private float Max(float v1, float v2)
+        {
+            if (v1 > v2) return v1;
+            return v2;
+        }
     }
 }
