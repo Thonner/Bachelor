@@ -36,6 +36,9 @@ namespace mnist_classification
 
         public void CalcMax()
         {
+
+            Output = new float[OutputWidth,OutputHeight,OutputDepth];
+
             float[,] part = new float[Size, Size];
 
             for (int k = 0; k < OutputDepth; k++)

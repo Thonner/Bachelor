@@ -24,13 +24,16 @@ namespace mnist_classification
 
         public float[,,] Input { get; set; }
 
-        public float[] Output { get; set; }
+        public float[,,] Output { get; set; }
 
 
 
         public void CalcFC()
         {
-           
+
+            Output = new float[1, 1, OutputSize];
+
+
 
             for (int output = 0; output < OutputSize; output++)
             {
@@ -44,7 +47,7 @@ namespace mnist_classification
                     {
                         for (int k = 0; k < InputDepth; k++)
                         {
-                            Output[output] += WeightsArray[output,counter] * Input[i, j, k];
+                            Output[0,0,output] += WeightsArray[output,counter] * Input[i, j, k];
                             counter++;
                         }
                     }

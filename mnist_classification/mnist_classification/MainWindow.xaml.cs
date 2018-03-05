@@ -18,6 +18,9 @@ using System.IO;
 
 
 
+using System.Drawing;
+
+
 namespace mnist_classification
 {
     /// <summary>
@@ -29,6 +32,8 @@ namespace mnist_classification
         public int layerCount = 0;
         public MainWindow()
         {
+
+
             InitializeComponent();
         }
 
@@ -272,6 +277,139 @@ namespace mnist_classification
                 }
                 fileStream.Close();
             }
+        }
+
+
+
+        Bitmap pic;
+
+        private void LoadPic_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            OpenFileDialog fileDialog = new OpenFileDialog();
+
+
+            fileDialog.Filter = "png Files (.png)|*.png|All Files (*.*)|*.*";
+
+            fileDialog.FilterIndex = 1;
+
+
+            bool? userClickedOK = fileDialog.ShowDialog();
+
+            // Process input if the user clicked OK.
+            if (userClickedOK == true)
+            {
+                // Open the selected file to read.
+                pic = new Bitmap(fileDialog.FileName);
+
+                //Make room for the file
+                Layers[0].Conv.Input = new float[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
+
+            
+
+
+
+                for (int i = 0; i < Layers[0].Conv.Input.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Layers[0].Conv.Input.GetLength(1); j++)
+                    {
+                        System.Drawing.Color color = pic.GetPixel(i, j);
+
+                        float red = 0, green = 0, blue = 0;
+
+
+                        red = color.R / 255.0F;
+                        green = color.G / 255.0F;
+                        blue = color.B / 255.0F;
+                        
+
+
+
+                        Layers[0].Conv.Input[i, j, 0] = red;
+                        Layers[0].Conv.Input[i, j, 1] = green;
+                        Layers[0].Conv.Input[i, j, 2] = blue;
+
+
+
+                    }
+                }
+            }
+        }
+
+        private void Calculate_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            for (int i = 0; i < Layers.Count; i++)
+            {
+                switch (Layers[i].LayerType)
+                {
+                    case "Conv":
+                        if(i != 0)
+                        {
+                            switch (Layers[i - 1].LayerType)
+                            {
+                                case "Max":
+                                    layers[i].Conv.Input = Layers[i - 1].Max.Output;
+                                    break;
+
+                                default:
+                                    throw new Exception("LAYER NOT RECOGNIZED");
+                                    break;
+                            }
+
+                        }
+                        Layers[i].Conv.CalcConv();
+
+                        break;
+
+                    case "Max":
+
+                        if (Layers[i - 1].LayerType != "Conv") throw new Exception("WRONG LAYER BEFORE MAX");
+
+                        Layers[i].Max.Input = Layers[i - 1].Conv.Output;
+
+                        Layers[i].Max.CalcMax();
+
+                        break;
+
+                    case "FC":
+
+
+                        switch (Layers[i-1].LayerType)
+                        {
+                            case "Max":
+                                Layers[i].FC.Input = Layers[i - 1].Max.Output;
+                                break;
+
+                            case "FC":
+                                Layers[i].FC.Input =  Layers[i - 1].FC.Output;
+                                break;
+
+
+                            default:
+                                throw new Exception("LAYER NOT RECOGNIZED");
+                                break;
+                        }
+
+                        Layers[i].FC.CalcFC();
+
+                        break;
+
+                       
+
+                    default:
+                        break;
+                }
+            }
+
+
+
+
+
+
+
+
         }
     }
 }

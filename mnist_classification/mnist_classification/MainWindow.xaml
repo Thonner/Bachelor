@@ -9,6 +9,16 @@
     <Grid>
         <Button x:Name="Load_cfg_Button" Content="Load cfg" HorizontalAlignment="Left" Margin="41,26,0,0" VerticalAlignment="Top" Width="75" Click="Load_cfg_Button_Click"/>
         <Button x:Name="Load_weights_Button" Content="Load Weights" HorizontalAlignment="Left" Margin="184,26,0,0" VerticalAlignment="Top" Width="89" Click="Load_weights_Button_Click"/>
+        <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Left" Height="228" Margin="41,65,0,0" VerticalAlignment="Top" Width="228">
+            <InkCanvas Name="inkCanvas" Height="224" VerticalAlignment="Top" HorizontalAlignment="Left" Width="224" Background="White">
+
+            </InkCanvas>
+        </Border>
+        <Button Content="Use" HorizontalAlignment="Left" Margin="419,93,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="LoadPic" HorizontalAlignment="Left" Margin="319,26,0,0" VerticalAlignment="Top" Width="75" Click="LoadPic_Button_Click"/>
+        <Button Content="Clear" HorizontalAlignment="Left" Margin="419,118,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Calculate" HorizontalAlignment="Left" Margin="419,26,0,0" VerticalAlignment="Top" Width="75" Click="Calculate_Button_Click"/>
+        <TextBox Name="TextBoxResult" HorizontalAlignment="Left" Height="228" Margin="289,65,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="105"/>
 
     </Grid>
 </Window>

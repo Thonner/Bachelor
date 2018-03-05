@@ -45,6 +45,9 @@ namespace mnist_classification
 
         public void CalcConv()
         {
+
+            Output = new float[OutputWidth, OutputHeight, OutputDepth];
+
             //Part of the array, used for convolution.
             float[,,] part = new float[FilterSize, FilterSize, InputDepth];
 
