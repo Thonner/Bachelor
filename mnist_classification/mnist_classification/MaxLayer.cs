@@ -20,8 +20,7 @@ namespace mnist_classification
         public int OutputHeight { get; set; }
 
         public int OutputDepth { get; set; }
-
-
+        
         public int Size { get; set; }
         public int Stride { get; set; }
 

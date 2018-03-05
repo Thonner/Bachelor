@@ -30,7 +30,7 @@ namespace mnist_classification
 
         public Filter[] FilterArray { get; set; }
 
-        public double[] bias { get; set; }
+        public double[] Bias { get; set; }
 
 
         //Input and output is given as width times height times depth.
