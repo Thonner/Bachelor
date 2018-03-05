@@ -22,6 +22,8 @@ namespace mnist_classification
 
         public float[,] WeightsArray { get; set; }
 
+        public float[] Bias { get; set; }
+
         public float[,,] Input { get; set; }
 
         public float[,,] Output { get; set; }

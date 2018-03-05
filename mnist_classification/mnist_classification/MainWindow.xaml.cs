@@ -42,7 +42,10 @@ namespace mnist_classification
         private void Load_cfg_Button_Click(object sender, RoutedEventArgs e)
         {
             //Load cfg file
+            int netHeight = 0, netWidth = 0, netChannels = 0;
+
             Console.WriteLine("Pressed load cfg");
+
 
 
 
@@ -71,13 +74,79 @@ namespace mnist_classification
 
                     string tempString;
                     long readPos = 0;
-                    
 
+                    reader.DiscardBufferedData();
                     while (!reader.EndOfStream)
                     {
-                        reader.BaseStream.Position = readPos;
+                        
                         tempString = reader.ReadLine();
-                        readPos = reader.BaseStream.Position;
+
+                        if (tempString == "[maxpool]")
+                        {
+                            Layers.Add(new Layers());
+                            layerCount++;
+                            Layers[layerCount - 1].LayerType = "Max";
+                            Layers[layerCount - 1].Max = new MaxLayer();
+
+                            while (tempString != "")
+                            {
+                                switch (tempString.Substring(0, 3))
+                                {
+                                    case "siz":
+                                        Layers[layerCount - 1].Max.Size = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        break;
+
+                                    case "str":
+                                        Layers[layerCount - 1].Max.Stride = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                tempString = reader.ReadLine();
+                            }
+                            
+                            Layers[layerCount - 1].Max.InputDepth = Layers[layerCount - 2].Conv.OutputDepth;
+                            Layers[layerCount - 1].Max.InputHeight = Layers[layerCount - 2].Conv.OutputHeight;
+                            Layers[layerCount - 1].Max.InputWidth = Layers[layerCount - 2].Conv.OutputWidth;
+
+                            Layers[layerCount - 1].Max.OutputDepth = Layers[layerCount - 1].Max.InputDepth;
+                            Layers[layerCount - 1].Max.OutputWidth = Layers[layerCount - 1].Max.InputWidth / Layers[layerCount - 1].Max.Size;
+                            Layers[layerCount - 1].Max.OutputHeight = Layers[layerCount - 1].Max.InputHeight / Layers[layerCount - 1].Max.Size;
+
+
+                        }
+
+                        if (tempString == "[net]")
+                        {
+                            while (tempString != "")
+                            {
+
+
+                                switch (tempString.Substring(0, 3))
+                                {
+                                    case "hei":
+
+                                        netHeight = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        break;
+
+                                    case "wid":
+
+                                        netWidth = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        break;
+
+                                    case "cha":
+
+                                        netChannels = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                tempString = reader.ReadLine();
+                            }
+                        }
+                        
                         if (tempString == "[convolutional]")
                         {
                             Layers.Add(new Layers());
@@ -85,15 +154,45 @@ namespace mnist_classification
                             Layers[layerCount - 1].LayerType = "Conv";
                             Layers[layerCount - 1].Conv = new ConvLayer();
 
+                            if(layerCount == 1)
+                            {
+                                Layers[layerCount - 1].Conv.InputDepth = netChannels;
+                                Layers[layerCount - 1].Conv.InputHeight = netHeight;
+                                Layers[layerCount - 1].Conv.InputWidth = netWidth;
+
+                            }
+                            else
+                            {
+                                switch (Layers[layerCount - 2].LayerType)
+                                {
+                                    case "Conv":
+                                        Layers[layerCount - 1].Conv.InputDepth = Layers[layerCount - 2].Conv.OutputDepth;
+                                        Layers[layerCount - 1].Conv.InputHeight = Layers[layerCount - 2].Conv.OutputHeight;
+                                        Layers[layerCount - 1].Conv.InputWidth = Layers[layerCount - 2].Conv.OutputWidth;
+                                        break;
+
+                                    case "Max":
+                                        Layers[layerCount - 1].Conv.InputDepth = Layers[layerCount - 2].Max.OutputDepth;
+                                        Layers[layerCount - 1].Conv.InputHeight = Layers[layerCount - 2].Max.OutputHeight;
+                                        Layers[layerCount - 1].Conv.InputWidth = Layers[layerCount - 2].Max.OutputWidth;
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+
+
+                            }
+
 
                             tempString = reader.ReadLine();
-                            while(tempString.First() != '[')
+                            while(tempString != "")
                             {
                                 switch (tempString.Substring(0, 3))
                                 {
                                     case "fil":
                                         Layers[layerCount - 1].Conv.Filters = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
-                                        Layers[layerCount - 1].Conv.bias = new double[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
+                                        Layers[layerCount - 1].Conv.Bias = new double[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
                                         break;
 
                                     case "siz":
@@ -106,12 +205,16 @@ namespace mnist_classification
 
                                     case "pad":
                                         Layers[layerCount - 1].Conv.Pad = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
+                                        if(Layers[layerCount - 1].Conv.Pad == 1)
+                                        {
+                                            Layers[layerCount - 1].Conv.Pad = (Layers[layerCount - 1].Conv.FilterSize - 1) / 2;
+                                        }
+
                                         break;
                                         
                                     default:
                                         break;
                                 }
-                                readPos = reader.BaseStream.Position;
                                 tempString = reader.ReadLine();
                             }
 
@@ -119,12 +222,25 @@ namespace mnist_classification
 
                             for(int i = 0; i < Layers[layerCount - 1].Conv.Filters; i++)
                             {
+                                Layers[layerCount - 1].Conv.FilterArray[i] = new Filter();
                                 Layers[layerCount - 1].Conv.FilterArray[i].Height = Layers[layerCount - 1].Conv.FilterSize;
                                 Layers[layerCount - 1].Conv.FilterArray[i].Width = Layers[layerCount - 1].Conv.FilterSize;
+                                if(layerCount == 1)
+                                {
+                                    Layers[layerCount - 1].Conv.FilterArray[i].Depth = netChannels;
+                                }
+                                else
+                                {
+                                    Layers[layerCount - 1].Conv.FilterArray[i].Depth = Layers[layerCount - 1].Conv.InputDepth;
+                                }
                                 //Layers[layerCount - 1].Conv.FilterArray[i].Depth = ?? should be calculated from preveos layer
-                                //Layers[layerCount - 1].Conv.FilterArray[i].Weights = new float[Layers[layerCount - 1].Conv.FilterArray[i].Depth, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Height];
+                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new float[Layers[layerCount - 1].Conv.FilterArray[i].Depth, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Height];
 
                             }
+
+                            Layers[layerCount - 1].Conv.OutputDepth = Layers[layerCount - 1].Conv.Filters;
+                            Layers[layerCount - 1].Conv.OutputHeight = (Layers[layerCount - 1].Conv.InputHeight + (Layers[layerCount - 1].Conv.Pad * 2) - Layers[layerCount - 1].Conv.FilterSize) / (Layers[layerCount - 1].Conv.Stride) + 1;
+                            Layers[layerCount - 1].Conv.OutputWidth = (Layers[layerCount - 1].Conv.InputWidth + (Layers[layerCount - 1].Conv.Pad * 2) - Layers[layerCount - 1].Conv.FilterSize) / (Layers[layerCount - 1].Conv.Stride) + 1;
 
 
                         }
@@ -137,14 +253,68 @@ namespace mnist_classification
 
                             tempString = reader.ReadLine();
 
-                            while (tempString.First() != '[')
+                            while (tempString != "")
                             {
                                 //Load settings for FC to be written
+
+                                switch (tempString.Substring(0, 3))
+                                {
+                                    case "out":
+                                        Layers[layerCount - 1].FC.OutputSize = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 2));
+                                        break;
+
+                                    default:
+
+                                        break;
+                                }
 
                                 readPos = reader.BaseStream.Position;
                                 tempString = reader.ReadLine();
                             }
-                        }
+                            
+                            switch(Layers[layerCount - 2].LayerType)
+                            {
+                                case "Conv":
+                                    Layers[layerCount - 1].FC.InputWidth = Layers[layerCount - 2].Conv.OutputWidth;
+                                    Layers[layerCount - 1].FC.InputHeight = Layers[layerCount - 2].Conv.OutputHeight;
+                                    Layers[layerCount - 1].FC.InputDepth = Layers[layerCount - 2].Conv.OutputDepth;
+
+                                    Layers[layerCount - 1].FC.Weights = Layers[layerCount - 2].Conv.OutputWidth * Layers[layerCount - 2].Conv.OutputHeight * Layers[layerCount - 2].Conv.OutputDepth * Layers[layerCount - 1].FC.OutputSize;
+
+                                    Layers[layerCount - 1].FC.WeightsArray = new float[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
+
+                                    Layers[layerCount - 1].FC.Bias = new float[Layers[layerCount - 1].FC.OutputSize];
+                                    break;
+
+                                case "FC":
+                                    Layers[layerCount - 1].FC.InputHeight = Layers[layerCount - 2].FC.OutputSize;
+                                    Layers[layerCount - 1].FC.InputHeight = 1;
+                                    Layers[layerCount - 1].FC.InputDepth = 1;
+
+                                    Layers[layerCount - 1].FC.Weights = Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.OutputSize;
+
+                                    Layers[layerCount - 1].FC.WeightsArray = new float[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputHeight];
+
+                                    Layers[layerCount - 1].FC.Bias = new float[Layers[layerCount - 1].FC.OutputSize];
+
+                                    break;
+
+                                case "Max":
+                                    Layers[layerCount - 1].FC.InputHeight = Layers[layerCount - 2].Max.OutputHeight;
+                                    Layers[layerCount - 1].FC.InputWidth = Layers[layerCount - 2].Max.OutputWidth;
+                                    Layers[layerCount - 1].FC.InputDepth = Layers[layerCount - 2].Max.OutputDepth;
+
+                                    Layers[layerCount - 1].FC.Weights = Layers[layerCount - 2].Max.OutputWidth * Layers[layerCount - 2].Max.OutputHeight * Layers[layerCount - 2].Max.OutputDepth * Layers[layerCount - 1].FC.OutputSize;
+
+                                    Layers[layerCount - 1].FC.WeightsArray = new float[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
+                                    Layers[layerCount - 1].FC.Bias = new float[Layers[layerCount - 1].FC.OutputSize];
+
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                                                    }
                     }
 
 
@@ -188,92 +358,57 @@ namespace mnist_classification
 
                     int major, minor, revision, seen;
 
-                    //Hard coded for test:
-
-                    /*
-                    float[, , ,] filterbankconv1 = new float[16, 3, 3, 3]; //filter bank from tiny-yolo
-                    float[] biasBankConv1 = new float[16];
-                    float[] scales = new float[16];
-                    float[] rollingMeans = new float[16];
-                    float[] rollingVarians = new float[16]
-
-                    for(int bias = 0; bias < 16; bias++){
-                        biasBankConv1[bias] = br.ReadSingle();
-                    }
-
-                    for (int i = 0; i < 16; i++)
-                    {
-                        scales[i] = br.ReadSingle();
-                    }
-
-                    for (int i = 0; i < 16; i++)
-                    {
-                        rollingMeans[i] = br.ReadSingle();
-                    }
-
-                    for (int i = 0; i < 16; i++)
-                    {
-                        rollingVarians[i] = br.ReadSingle();
-                    }
-
-                    for (int filterNr = 0; filterNr < 16; filterNr++)
-                    {
-                        for(int filterZ = 0; filterZ < 3; filterZ++)
-                        {
-                            for(int filterY = 0; filterY < 3; filterY++)
-                            {
-                                for(int filterX = 0; filterX < 3; filterX++)
-                                {
-                                    filterbankconv1[filterNr, filterZ, filterY, filterX] = br.ReadSingle();
-                                }
-                            }
-                        }
-                    }
-                    */
-
-
-
-
+                    
                     layerCount = 0;
-
-                    for(int i = 0; i < Layers.Count; i++)
+                    major = br.ReadInt32();
+                    minor = br.ReadInt32();
+                    revision = br.ReadInt32();
+                    seen = br.ReadInt32();
+                    for (int i = 0; i < Layers.Count; i++)
                     {
 
                         if (Layers[i].LayerType == "Conv")
                         {
-                            major = br.ReadInt32();
-                            minor = br.ReadInt32();
-                            revision = br.ReadInt32();
-                            seen = br.ReadInt32();
-
+                            
                             for(int j = 0; j < Layers[i].Conv.Filters; j++)
                             {
-                                Layers[i].Conv.bias[j] = br.ReadSingle();
+                                Layers[i].Conv.Bias[j] = br.ReadSingle();
                             }
                             // Write code that can determine wheter or not scales an
 
-                            for (int filterNr = 0; filterNr < Layers[layerCount].Conv.Filters; filterNr++)
+                            for (int filterNr = 0; filterNr < Layers[i].Conv.Filters; filterNr++)
                             {
-                                for (int filterZ = 0; filterZ < Layers[layerCount].Conv.FilterSize; filterZ++)
+                                for (int filterZ = 0; filterZ < Layers[i].Conv.InputDepth; filterZ++)
                                 {
-                                    for (int filterY = 0; filterY < Layers[layerCount].Conv.FilterSize; filterY++)
+                                    for (int filterY = 0; filterY < Layers[i].Conv.FilterSize; filterY++)
                                     {
-                                        for (int filterX = 0; filterX < Layers[layerCount].Conv.InputDepth; filterX++)
+                                        for (int filterX = 0; filterX < Layers[i].Conv.FilterSize; filterX++)
                                         {
-                                            Layers[layerCount].Conv.FilterArray[filterNr].Weights[filterZ, filterY, filterX] = br.ReadSingle();
+                                            Layers[i].Conv.FilterArray[filterNr].Weights[filterX, filterY, filterZ] = br.ReadSingle();
                                         }
                                     }
                                 }
                             }
+                        }
+                        else if(Layers[i].LayerType == "FC")
+                        {
 
-
+                            for(int bias = 0; bias < Layers[i].FC.OutputSize; bias++)
+                            {
+                                Layers[i].FC.Bias[bias] = br.ReadSingle();
+                            }
+                            
+                            for(int outputs = 0; outputs < Layers[i].FC.OutputSize; outputs++)
+                            {
+                                for(int inputs = 0; inputs < Layers[i].FC.InputDepth* Layers[i].FC.InputHeight* Layers[i].FC.InputWidth; inputs++)
+                                {
+                                    Layers[i].FC.WeightsArray[outputs, inputs] = br.ReadSingle();
+                                }
+                            }
 
                         }
-                        
-
+                        //If Batch normalize has been set. scales means and varians should be loaded as well.
                     }
-
-
                 }
                 fileStream.Close();
             }
