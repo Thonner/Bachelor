@@ -32,12 +32,52 @@ namespace mnist_classification
         public int layerCount = 0;
         public MainWindow()
         {
-
+            FixedTest();
 
             InitializeComponent();
         }
 
         internal List<Layers> Layers { get => layers; set => layers = value; }
+
+
+
+        private static void FixedTest()
+        {
+            //Example of how Fixed works.
+            double d1, d2, d3, d4, d5;
+
+            Fixed fix = new Fixed(0.1);
+
+            d1 = fix.Double();
+
+            Fixed fu = 0.1;
+
+            Fixed fu1 = 0.4;
+
+            fu = fu + fu1;
+
+            d1 = fu;
+
+            Fixed fix2 = new Fixed(0.2);
+
+            d2 = fix2.Double();
+
+
+            Fixed fix3 = fix + fix2;
+
+            d3 = fix3.Double();
+
+
+            Fixed fix4 = fix * fix2;
+
+            d4 = fix4.Double();
+
+
+            Fixed fix5 = fix3 - fix2;
+
+            d5 = fix5.Double();
+        }
+
 
         private void Load_cfg_Button_Click(object sender, RoutedEventArgs e)
         {
