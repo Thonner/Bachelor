@@ -44,38 +44,21 @@ namespace mnist_classification
         private static void FixedTest()
         {
             //Example of how Fixed works.
-            double d1, d2, d3, d4, d5;
 
-            Fixed fix = new Fixed(0.1);
+            Fixed fix1, fix2, fix3;
 
-            d1 = fix.Double();
-
-            Fixed fu = 0.1;
-
-            Fixed fu1 = 0.4;
-
-            fu = fu + fu1;
-
-            d1 = fu;
-
-            Fixed fix2 = new Fixed(0.2);
-
-            d2 = fix2.Double();
+            fix1 = (Fixed) 2;
+            fix2 = (Fixed) (-4);
+            fix3 = fix1 + fix2;
+            fix3 = fix1 - fix2;
 
 
-            Fixed fix3 = fix + fix2;
+            fix1 = (Fixed)17;
+            fix2 = (Fixed)4;
 
-            d3 = fix3.Double();
-
-
-            Fixed fix4 = fix * fix2;
-
-            d4 = fix4.Double();
+            fix3 = fix2 * fix1;
 
 
-            Fixed fix5 = fix3 - fix2;
-
-            d5 = fix5.Double();
         }
 
 

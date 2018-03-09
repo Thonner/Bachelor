@@ -9,38 +9,71 @@ namespace mnist_classification
 
     class Fixed : System.Object
     {
-        private ushort value;
+        private short value;
 
         const int right = 10;
         const int left = 6;
 
         const int multiplier = 1024; //2^right;
 
-        public Fixed(double value)
-        {
-            int temp = (ushort)(value * multiplier);
-
-
-            this.value = (ushort)temp;
-        }
-
-        private Fixed(ushort value)
+        private Fixed(short value)
         {
             this.value = value;
         }
+
+        public Fixed(double value)
+        {
+            int temp = (short)(value * multiplier);
+
+
+            this.value = (short)temp;
+        }
+
+        public Fixed(int value)
+        {
+            int temp = (short)(value * multiplier);
+
+
+            this.value = (short)temp;
+        }
+
 
 
         public static Fixed operator + (Fixed f1, Fixed f2)
         {
 
-            return new Fixed((ushort)(f1.value + f2.value));
+            int temp = (f1.value + f2.value);
+
+            //If both are negative, result should be negative
+            if(f1.value < 0 && f2.value < 0)
+            {
+                if(temp < Int16.MinValue )
+                {
+                    //Underflow occured, set to min value.
+                    temp = Int16.MinValue;
+                }
+                //If both are positive, result should be positive.
+            }else if(f1.value >= 0 && f2.value >= 0)
+            {
+                if(temp > Int16.MaxValue)
+                {
+                    //Overflow occured, set to max value.
+                    temp = Int16.MaxValue;
+                }
+            }
+            //If one is negative and the other is positive, it will not overflow.
+
+            return new Fixed((short)temp);
         }
 
         public static Fixed operator -(Fixed f1, Fixed f2)
         {
 
+            //We invert the right side and can use our adder.
+            Fixed temp = new Fixed((short)(0 - f2.value));
 
-            return new Fixed((ushort)(f1.value - f2.value));
+
+            return f1 + temp;
         }
 
         public static Fixed operator *(Fixed f1, Fixed f2)
@@ -49,10 +82,27 @@ namespace mnist_classification
 
             temp = temp >> right;
 
-            return new Fixed((ushort)temp);
+
+            if (temp < Int16.MinValue)
+            {
+                //Underflow occured, set to min value.
+                temp = Int16.MinValue;
+            } else if (temp > Int16.MaxValue)
+            {
+                //Overflow occured, set to max value.
+                temp = Int16.MaxValue;
+            }
+
+
+            return new Fixed((short)temp);
         }
 
-        public static implicit operator Fixed(double v)
+        public static explicit operator Fixed(double v)
+        {
+            return new Fixed(v);
+        }
+
+        public static explicit operator Fixed(int v)
         {
             return new Fixed(v);
         }
