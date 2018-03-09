@@ -58,6 +58,7 @@ namespace mnist_classification
 
             fix3 = fix2 * fix1;
 
+            fix3 = fix2 * fix3;
 
         }
 
