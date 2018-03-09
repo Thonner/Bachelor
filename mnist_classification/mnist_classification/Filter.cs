@@ -13,7 +13,7 @@ namespace mnist_classification
         public int Depth { get; set; }
 
         //weights are given as width times height times depth.
-        public float[,,] Weights { get; set; }
+        public Fixed[,,] Weights { get; set; }
 
     }
 }

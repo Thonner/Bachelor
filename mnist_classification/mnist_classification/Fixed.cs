@@ -11,8 +11,8 @@ namespace mnist_classification
     {
         private short value;
 
-        const int right = 10;
-        const int left = 6;
+        const int right = 10; //10
+        const int left = 6; //6
 
         const int multiplier = 1024; //2^right;
 
@@ -26,6 +26,18 @@ namespace mnist_classification
             int temp = (short)(value * multiplier);
 
 
+            if (temp < Int16.MinValue)
+            {
+                //Underflow occured, set to min value.
+                temp = Int16.MinValue;
+            }
+            else if (temp > Int16.MaxValue)
+            {
+                //Overflow occured, set to max value.
+                temp = Int16.MaxValue;
+            }
+
+
             this.value = (short)temp;
         }
 
@@ -34,6 +46,17 @@ namespace mnist_classification
             int temp = (short)(value * multiplier);
 
 
+            if (temp < Int16.MinValue)
+            {
+                //Underflow occured, set to min value.
+                temp = Int16.MinValue;
+            }
+            else if (temp > Int16.MaxValue)
+            {
+                //Overflow occured, set to max value.
+                temp = Int16.MaxValue;
+            }
+
             this.value = (short)temp;
         }
 
@@ -41,6 +64,10 @@ namespace mnist_classification
 
         public static Fixed operator + (Fixed f1, Fixed f2)
         {
+            if (f1 == null)
+            {
+                return f2;
+            }
 
             int temp = (f1.value + f2.value);
 
@@ -102,7 +129,7 @@ namespace mnist_classification
             return new Fixed(v);
         }
 
-        public static explicit operator Fixed(int v)
+        public static implicit operator Fixed(int v)
         {
             return new Fixed(v);
         }

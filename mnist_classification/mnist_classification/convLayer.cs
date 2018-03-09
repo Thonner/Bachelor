@@ -30,13 +30,13 @@ namespace mnist_classification
 
         public Filter[] FilterArray { get; set; }
 
-        public float[] Bias { get; set; }
+        public Fixed[] Bias { get; set; }
 
 
         //Input and output is given as width times height times depth.
-        public float[,,] Output { get; set; }
+        public Fixed[,,] Output { get; set; }
 
-        public float[,,] Input { get; set; }
+        public Fixed[,,] Input { get; set; }
 
 
 
@@ -46,10 +46,10 @@ namespace mnist_classification
         public void CalcConv()
         {
 
-            Output = new float[OutputWidth, OutputHeight, OutputDepth];
+            Output = new Fixed[OutputWidth, OutputHeight, OutputDepth];
 
             //Part of the array, used for convolution.
-            float[,,] part = new float[FilterSize, FilterSize, InputDepth];
+            Fixed[,,] part = new Fixed[FilterSize, FilterSize, InputDepth];
 
 
             for (int i = 0; i < InputWidth; i += Stride)
@@ -75,15 +75,15 @@ namespace mnist_classification
             }
         }
 
-        private float Max(float a, float b)
+        private Fixed Max(Fixed a, Fixed b)
         {
             if (a > b) return a;
             return b;
         }
 
-        private float MultFilter(Filter filter, float[,,] part)
+        private Fixed MultFilter(Filter filter, Fixed[,,] part)
         {
-            float sum = 0;
+            Fixed sum = 0;
 
             for(int i = 0; i< filter.Depth; i++)
             {
@@ -98,7 +98,7 @@ namespace mnist_classification
             return sum;
         }
 
-        private void FillPart(float[,,] part, int i, int j)
+        private void FillPart(Fixed[,,] part, int i, int j)
         {
             //Fill temp array with values.
             for (int n = 0; n < FilterSize; n++)
@@ -107,7 +107,7 @@ namespace mnist_classification
                 {
                     for (int k = 0; k < InputDepth; k++)
                     {
-                        float temp = 0;
+                        Fixed temp = 0;
 
                         if (n + i >= InputWidth) {
                             temp = 0;
