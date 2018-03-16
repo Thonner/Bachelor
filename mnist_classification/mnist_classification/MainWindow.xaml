@@ -14,9 +14,9 @@
 
             </InkCanvas>
         </Border>
-        <Button Content="Use" HorizontalAlignment="Left" Margin="419,93,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Name="Save_Button" Content="SaveWeights" HorizontalAlignment="Left" Margin="419,64,0,0" VerticalAlignment="Top" Width="75" Click="Save_Button_Click"/>
         <Button Content="LoadPic" HorizontalAlignment="Left" Margin="319,26,0,0" VerticalAlignment="Top" Width="75" Click="LoadPic_Button_Click"/>
-        <Button Name="Clear_pic_Button" Content="Clear" HorizontalAlignment="Left" Margin="419,118,0,0" VerticalAlignment="Top" Width="75" Click="Clear_pic_Button_Click"/>
+        <Button Name="Clear_pic_Button" Content="saveCase" HorizontalAlignment="Left" Margin="419,118,0,0" VerticalAlignment="Top" Width="75" Click="Clear_pic_Button_Click"/>
         <Button Content="Calculate" HorizontalAlignment="Left" Margin="419,26,0,0" VerticalAlignment="Top" Width="75" Click="Calculate_Button_Click"/>
         <TextBox Name="TextBoxResult" HorizontalAlignment="Left" Height="228" Margin="289,65,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="105"/>
 

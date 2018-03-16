@@ -586,6 +586,102 @@ namespace mnist_classification
 
         private void Clear_pic_Button_Click(object sender, RoutedEventArgs e)
         {
+
+
+        }
+
+        private void Save_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+
+            
+
+            fileDialog.Filter = "txt Files (.txt)|*.txt|All Files (*.*)|*.*";
+
+            fileDialog.FilterIndex = 1;
+            
+
+            bool? userClickedOK = fileDialog.ShowDialog();
+
+            // Process input if the user clicked OK.
+            if (userClickedOK == true)
+            {
+                // Open the selected file to read.
+                System.IO.Stream fileStream = fileDialog.OpenFile();
+
+                
+
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(fileStream))
+                {
+                    foreach(Layers layer in Layers)
+                    {
+                        if(layer.LayerType == "Conv")
+                        {
+                            foreach(float element in layer.Conv.Bias)
+                            {
+                                writer.WriteLine(element.ToString("F10"));
+                            }
+
+                            foreach(Filter array in layer.Conv.FilterArray)
+                            {
+                                foreach(float element in array.Weights)
+                                {
+                                    writer.WriteLine(element.ToString("F10"));
+                                }
+                            }
+                        }
+
+                        if(layer.LayerType == "FC")
+                        {
+                            foreach(float element in layer.FC.Bias)
+                            {
+                                writer.WriteLine(element.ToString("F10"));
+                            }
+
+                            foreach (float element in layer.FC.WeightsArray)
+                            {
+                                 writer.WriteLine(element.ToString("F10")); 
+                            }
+                        }
+                    }
+                }
+
+                for(int i = 0; i < Layers.Count; i++)
+                {
+                    if(Layers[i].LayerType == "Conv")
+                    {
+                        using (System.IO.StreamWriter writer = new System.IO.StreamWriter(fileDialog.FileName + "Conv" + i + ".txt" ))
+                        {
+                            foreach(float element in Layers[i].Conv.Output)
+                            {
+                                writer.WriteLine(element.ToString("F10"));
+                            }
+                        }
+                    }
+
+                    if (Layers[i].LayerType == "FC")
+                    {
+                        using (System.IO.StreamWriter writer = new System.IO.StreamWriter(fileDialog.FileName + "FC" + i + ".txt"))
+                        {
+                            foreach (float element in Layers[i].FC.Output)
+                            {
+                                writer.WriteLine(element.ToString("F10"));
+                            }
+                        }
+                    }
+
+                    if (Layers[i].LayerType == "Max")
+                    {
+                        using (System.IO.StreamWriter writer = new System.IO.StreamWriter(fileDialog.FileName + "Max" + i + ".txt"))
+                        {
+                            foreach (float element in Layers[i].Max.Output)
+                            {
+                                writer.WriteLine(element.ToString("F10"));
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
