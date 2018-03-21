@@ -9,7 +9,7 @@ namespace mnist_classification
 
     class Fixed : System.Object
     {
-        private short value;
+        public short value;
 
         const int right = 10; //10
         const int left = 6; //6
@@ -20,6 +20,7 @@ namespace mnist_classification
         {
             this.value = value;
         }
+
 
         public Fixed(double value)
         {

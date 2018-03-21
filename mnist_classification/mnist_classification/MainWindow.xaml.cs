@@ -587,6 +587,140 @@ namespace mnist_classification
 
         private void Clear_pic_Button_Click(object sender, RoutedEventArgs e)
         {
+
+            SaveVhdlRom();        
+        }
+
+        public void SaveVhdlFirstRom()
+        {
+
+        }
+
+        public void SaveVhdlRom()
+        {
+            var writer = new StreamWriter(@"C:\Users\simon\Desktop\weightsRom2.vhd");
+
+
+
+            Console.WriteLine("PRINTING OUT");
+
+
+
+            writer.WriteLine(@"library IEEE;
+    use IEEE.std_logic_1164.all;
+    use IEEE.numeric_std.all;
+
+    use work.Types.all;
+
+entity weightsRom is
+    generic (");
+            writer.WriteLine("\t\taddressX: integer range 0 to { 0}; ", Layers[0].Conv.FilterSize - 1);
+            writer.WriteLine("\t\taddressY: integer range 0 to {0}", Layers[0].Conv.FilterSize - 1);
+            writer.WriteLine(@"
+    );
+    port (
+        clk: in  std_logic;
+        rst: in  std_logic;");
+            writer.WriteLine("\t\tfilter: in integer range 0 to {0};", Layers[0].Conv.Filters - 1);
+
+            writer.WriteLine("\t\taddressZ: in integer range 0 to {0};", Layers[0].Conv.InputDepth - 1);
+            writer.WriteLine(@"
+        output: out signed(7 downto 0)
+    );
+end entity;
+
+architecture rtl of weightsRom is
+    
+begin
+    
+    
+    process(all)
+    begin
+        if rising_edge(clk) then
+            
+            case filter is");
+
+            int filters = Layers[0].Conv.Filters;
+            int size = Layers[0].Conv.FilterSize;
+            int depth = Layers[0].Conv.InputDepth;
+
+            for (int i = 0; i < filters; i++)
+            {
+                if (i != filters - 1)
+                {
+                    writer.WriteLine("\t\t\t\twhen {0} =>", i);
+                }
+                else
+                {
+                    writer.WriteLine("\t\t\t\twhen others =>");
+                }
+
+
+                writer.WriteLine("\t\t\t\t\tcase addressX is");
+
+
+                for (int j = 0; j < size; j++)
+                {
+                    if (j != size - 1)
+                    {
+                        writer.WriteLine("\t\t\t\t\t\twhen {0} =>", j);
+                    }
+                    else
+                    {
+                        writer.WriteLine("\t\t\t\t\t\twhen others =>");
+                    }
+
+                    writer.WriteLine("\t\t\t\t\t\t\tcase addressY is");
+
+
+                    for (int k = 0; k < size; k++)
+                    {
+                        if (k != size - 1)
+                        {
+                            writer.WriteLine("\t\t\t\t\t\t\t\twhen {0} =>", k);
+                        }
+                        else
+                        {
+                            writer.WriteLine("\t\t\t\t\t\t\t\twhen others =>");
+                        }
+
+                        writer.WriteLine("\t\t\t\t\t\t\t\t\tcase addressZ is");
+
+
+                        for (int l = 0; l < depth; l++)
+                        {
+
+                            if (l != depth - 1)
+                            {
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
+                            }
+                            else
+                            {
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                            }
+
+                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", Convert.ToString(((byte)Layers[0].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0'));
+
+
+                        }
+
+                        writer.WriteLine("\t\t\t\t\t\t\t\t\tend case;");
+
+                    }
+                    writer.WriteLine("\t\t\t\t\t\t\tend case;");
+                }
+                writer.WriteLine("\t\t\t\t\tend case;");
+
+
+
+            }
+
+
+            writer.WriteLine(@"            end case;
+        end if;
+    end process;
+end architecture;");
+            writer.Close();
         }
     }
 }
