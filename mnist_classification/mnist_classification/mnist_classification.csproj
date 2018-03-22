@@ -66,6 +66,7 @@
     <Compile Include="ConvLayer.cs" />
     <Compile Include="FCLayer.cs" />
     <Compile Include="Filter.cs" />
+    <Compile Include="Fix8.cs" />
     <Compile Include="Fixed.cs" />
     <Compile Include="Layers.cs" />
     <Compile Include="MainWindow.xaml.cs">

@@ -49,7 +49,7 @@ namespace mnist_classification
                     {
                         for (int i = 0; i < InputWidth; i++)
                         {
-                            Output[0,0,output] += WeightsArray[output,counter] * Input[i, j, k];
+                            Output[0,0,output] += Input[i, j, k] * WeightsArray[output,counter] ;
                             counter++;
                         }
                     }

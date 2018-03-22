@@ -45,16 +45,16 @@ namespace mnist_classification
         {
             //Example of how Fixed works.
 
-            Fixed fix1, fix2, fix3;
+            Fix8 fix1, fix2, fix3;
 
-            fix1 = (Fixed) 2;
-            fix2 = (Fixed) (-4);
+            fix1 = (Fix8) 2;
+            fix2 = (Fix8) (-4);
             fix3 = fix1 + fix2;
             fix3 = fix1 - fix2;
 
 
-            fix1 = (Fixed)17;
-            fix2 = (Fixed)4;
+            fix1 = (Fix8)17;
+            fix2 = (Fix8)4;
 
             fix3 = fix2 * fix1;
 
@@ -258,7 +258,7 @@ namespace mnist_classification
                                     Layers[layerCount - 1].Conv.FilterArray[i].Depth = Layers[layerCount - 1].Conv.InputDepth;
                                 }
                                 //Layers[layerCount - 1].Conv.FilterArray[i].Depth = ?? should be calculated from preveos layer
-                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new Fixed[Layers[layerCount - 1].Conv.FilterArray[i].Height, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Depth];
+                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new Fix8[Layers[layerCount - 1].Conv.FilterArray[i].Height, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Depth];
 
                             }
 
@@ -411,7 +411,7 @@ namespace mnist_classification
                                     {
                                         for (int filterX = 0; filterX < Layers[i].Conv.FilterSize; filterX++)
                                         {
-                                            Layers[i].Conv.FilterArray[filterNr].Weights[filterX, filterY, filterZ] = (Fixed) br.ReadSingle();
+                                            Layers[i].Conv.FilterArray[filterNr].Weights[filterX, filterY, filterZ] = (Fix8) br.ReadSingle();
                                         }
                                     }
                                 }
@@ -588,12 +588,117 @@ namespace mnist_classification
         private void Clear_pic_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            SaveVhdlRom();        
+            SaveVhdlRom();
+            SaveVhdlFirstRom();
         }
 
         public void SaveVhdlFirstRom()
         {
+            var writer = new StreamWriter(@"C:\Users\simon\Desktop\FirstRom.vhd");
 
+
+
+            Console.WriteLine("PRINTING OUT");
+
+
+
+            writer.WriteLine(@"library IEEE;
+    use IEEE.std_logic_1164.all;
+    use IEEE.numeric_std.all;
+
+    use work.Types.all;
+
+entity FirstRom is
+    port (
+        clk: in  std_logic;");
+            writer.WriteLine("\t\taddressX: in integer range 0 to {0}; ", Layers[0].Conv.InputWidth - 1);
+            writer.WriteLine("\t\taddressY: in integer range 0 to {0};", Layers[0].Conv.InputHeight - 1);
+            writer.WriteLine("\t\taddressZ: in integer range 0 to {0};", Layers[0].Conv.InputDepth - 1);
+            writer.WriteLine(@"
+        output: out unsigned(15 downto 0)
+    );
+end entity;
+
+architecture rtl of FirstRom is
+    
+begin
+    
+    
+    process(all)
+    begin
+        if rising_edge(clk) then 
+");
+
+            int x = Layers[0].Conv.InputWidth;
+            int y = Layers[0].Conv.InputHeight;
+            int depth = Layers[0].Conv.InputDepth;
+
+
+
+                writer.WriteLine("\t\t\t\t\tcase addressX is");
+
+
+                for (int j = 0; j < x; j++)
+                {
+                    if (j != x - 1)
+                    {
+                        writer.WriteLine("\t\t\t\t\t\twhen {0} =>", j);
+                    }
+                    else
+                    {
+                        writer.WriteLine("\t\t\t\t\t\twhen others =>");
+                    }
+
+                    writer.WriteLine("\t\t\t\t\t\t\tcase addressY is");
+
+
+                    for (int k = 0; k < y; k++)
+                    {
+                        if (k != y - 1)
+                        {
+                            writer.WriteLine("\t\t\t\t\t\t\t\twhen {0} =>", k);
+                        }
+                        else
+                        {
+                            writer.WriteLine("\t\t\t\t\t\t\t\twhen others =>");
+                        }
+
+                        writer.WriteLine("\t\t\t\t\t\t\t\t\tcase addressZ is");
+
+
+                        for (int l = 0; l < depth; l++)
+                        {
+
+                            if (l != depth - 1)
+                            {
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
+                            }
+                            else
+                            {
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                            }
+
+                            string temp = Convert.ToString((Layers[0].Conv.Input[j,k,l].value), 2).PadLeft(16, '0');
+
+                        
+                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
+
+
+                        }
+
+                        writer.WriteLine("\t\t\t\t\t\t\t\t\tend case;");
+
+                    }
+                    writer.WriteLine("\t\t\t\t\t\t\tend case;");
+                }
+                writer.WriteLine("\t\t\t\t\tend case;");
+
+
+            writer.WriteLine(@"
+        end if;
+    end process;
+end architecture;");
+            writer.Close();
         }
 
         public void SaveVhdlRom()
@@ -614,7 +719,7 @@ namespace mnist_classification
 
 entity weightsRom is
     generic (");
-            writer.WriteLine("\t\taddressX: integer range 0 to { 0}; ", Layers[0].Conv.FilterSize - 1);
+            writer.WriteLine("\t\taddressX: integer range 0 to {0}; ", Layers[0].Conv.FilterSize - 1);
             writer.WriteLine("\t\taddressY: integer range 0 to {0}", Layers[0].Conv.FilterSize - 1);
             writer.WriteLine(@"
     );
@@ -699,7 +804,14 @@ begin
                                 writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
                             }
 
-                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", Convert.ToString(((byte)Layers[0].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0'));
+                            string temp = Convert.ToString((Layers[0].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0');
+
+                            temp = temp.Remove(0, -8 + temp.Length);
+
+
+
+
+                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
 
 
                         }

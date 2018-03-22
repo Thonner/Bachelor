@@ -91,7 +91,7 @@ namespace mnist_classification
                 {
                     for(int k = 0; k< filter.Width; k++)
                     {
-                        sum += filter.Weights[k, j, i] * part[k,j,i];
+                        sum += part[k, j, i] *  filter.Weights[k, j, i];
                     }
                 }
             }
