@@ -14,10 +14,10 @@ namespace mnist_classification
 
         //More bytes on the right side than possible, due to shifted value.
         // FORM:
-        // s.00XXXXXXX
+        // s.ssXXXXXXX
         // Where s it MSB, the two zeroes are implied and the seven X are the lower 7 bits.
         public const int right = 9;
-        public const int left = 0;
+        public const int left = 1;
 
         const int multiplier = 512; //2^right;
 
