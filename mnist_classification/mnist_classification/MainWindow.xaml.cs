@@ -609,17 +609,21 @@ namespace mnist_classification
 
     use work.Types.all;
 
-entity weightsRom is
+entity biasRom is
     port (
         clk: in  std_logic;
         rst: in  std_logic;");
-            writer.WriteLine("\t\tfilter: in integer range 0 to {0};", Layers[0].Conv.Bias.Length - 1);
+            writer.WriteLine("\t\tlayer: in integer range 0 to {0};",(Layers.Count+1)/2);
+
+
+
+            writer.WriteLine("\t\tfilter: in integer range 0 to {0};", Math.Max( Layers[0].Conv.Bias.Length - 1, Layers[2].Conv.Bias.Length - 1));
             writer.WriteLine(@"
         output: out signed(7 downto 0)
     );
 end entity;
 
-architecture rtl of weightsRom is
+architecture rtl of biasRom is
     
 begin
     
@@ -627,34 +631,75 @@ begin
     process(all)
     begin
         if rising_edge(clk) then
-            
-            case filter is");
+            case layer is");
 
-            int filters = Layers[0].Conv.Filters;
+            for (int layer = 0; layer < (Layers.Count + 1) / 2; layer++) {
 
-            for (int i = 0; i < filters; i++)
-            {
-                if (i != filters - 1)
-                {
-                    writer.WriteLine("\t\t\t\twhen {0} =>", i);
+                if ((Layers.Count + 1) / 2 != layer+1 ) { 
+                    writer.WriteLine("\t\t\t\twhen {0} =>", layer);
+
+
+                    writer.WriteLine("\t\t\t\t\tcase filter is");
+
+                    int filters = Layers[layer * 2].Conv.Filters;
+
+                    for (int i = 0; i < filters; i++)
+                    {
+                        if (i != filters - 1)
+                        {
+                            writer.WriteLine("\t\t\t\t\t\twhen {0} =>", i);
+                        }
+                        else
+                        {
+                            writer.WriteLine("\t\t\t\t\t\twhen others =>");
+                        }
+
+                        string temp = Convert.ToString((Layers[layer * 2].Conv.Bias[i].value), 2).PadLeft(8, '0');
+
+
+                        temp = temp.Remove(0, -8 + temp.Length);
+
+
+                        writer.WriteLine("\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
+
+                    }
+
+                    writer.WriteLine("\t\t\t\t\t\tend case;");
                 }
                 else
                 {
                     writer.WriteLine("\t\t\t\twhen others =>");
+
+                    writer.WriteLine("\t\t\t\t\tcase filter is");
+
+                    int filters = Layers[layer * 2].FC.OutputSize;
+
+                    for (int i = 0; i < filters; i++)
+                    {
+                        if (i != filters - 1)
+                        {
+                            writer.WriteLine("\t\t\t\t\t\twhen {0} =>", i);
+                        }
+                        else
+                        {
+                            writer.WriteLine("\t\t\t\t\t\twhen others =>");
+                        }
+
+                        string temp = Convert.ToString((Layers[layer * 2].FC.Bias[i].value), 2).PadLeft(8, '0');
+
+
+                        temp = temp.Remove(0, -8 + temp.Length);
+
+
+                        writer.WriteLine("\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
+
+                    }
+
+                    writer.WriteLine("\t\t\t\t\t\tend case;");
                 }
 
-                string temp = Convert.ToString((Layers[0].Conv.Bias[i].value), 2).PadLeft(8, '0');
 
-
-                temp = temp.Remove(0, -8 + temp.Length);
-
-
-                writer.WriteLine("\t\t\t\t\t\toutput <= \"{0}\";", temp);
-
-                writer.WriteLine("\t\t\t\t\tend case;");
             }
-
-
             writer.WriteLine(@"            end case;
         end if;
     end process;
@@ -786,7 +831,6 @@ end architecture;");
     use IEEE.std_logic_1164.all;
     use IEEE.numeric_std.all;
 
-    use work.Types.all;
 
 entity weightsRom is
     generic (");
@@ -797,105 +841,332 @@ entity weightsRom is
     port (
         clk: in  std_logic;
         rst: in  std_logic;");
-            writer.WriteLine("\t\tfilter: in integer range 0 to {0};", Layers[0].Conv.Filters - 1);
+            writer.WriteLine("\t\tlayer: in integer range 0 to {0};", (Layers.Count)/2);
+            writer.WriteLine("\t\tfilter: in integer range 0 to {0};", Math.Max(Layers[0].Conv.Filters - 1, Layers[2].Conv.Filters - 1));
 
-            writer.WriteLine("\t\taddressZ: in integer range 0 to {0};", Layers[0].Conv.InputDepth - 1);
+            writer.WriteLine("\t\taddressZ: in integer range 0 to {0};", Math.Max(Math.Max( Layers[0].Conv.InputDepth - 1, Layers[2].Conv.InputDepth - 1), Layers[Layers.Count-1].FC.InputDepth*4-1));
             writer.WriteLine(@"
         output: out signed(7 downto 0)
     );
 end entity;
 
 architecture rtl of weightsRom is
-    
+    variable output1 : integer;
 begin
     
-    
+        output <= to_signed(output1,output'length);
     process(all)
     begin
+
         if rising_edge(clk) then
             
-            case filter is");
+            case layer is");
 
-            int filters = Layers[0].Conv.Filters;
-            int size = Layers[0].Conv.FilterSize;
-            int depth = Layers[0].Conv.InputDepth;
-
-            for (int i = 0; i < filters; i++)
+            for (int layer = 0; layer <= (Layers.Count - 1) / 2; layer++)
             {
-                if (i != filters - 1)
+
+                if ((Layers.Count + 1) / 2 != layer + 1)
                 {
-                    writer.WriteLine("\t\t\t\twhen {0} =>", i);
+                    writer.WriteLine("\t\t\t\twhen {0} =>", layer);
+
+
+
+                    writer.WriteLine("\t\t\t\tcase filter is");
+
+                    int filters = Layers[layer * 2].Conv.Filters;
+                    int size = Layers[layer * 2].Conv.FilterSize;
+                    int depth = Layers[layer * 2].Conv.InputDepth;
+
+                    for (int i = 0; i < filters; i++)
+                    {
+                        if (i != filters - 1)
+                        {
+                            writer.WriteLine("\t\t\t\twhen {0} =>", i);
+                        }
+                        else
+                        {
+                            writer.WriteLine("\t\t\t\twhen others =>");
+                        }
+
+
+                        writer.WriteLine("\t\t\t\t\tcase addressX is");
+
+
+                        for (int j = 0; j < size; j++)
+                        {
+                            if (j != size - 1)
+                            {
+                                writer.WriteLine("\t\t\t\t\t\twhen {0} =>", j);
+                            }
+                            else
+                            {
+                                writer.WriteLine("\t\t\t\t\t\twhen others =>");
+                            }
+
+                            writer.WriteLine("\t\t\t\t\t\t\tcase addressY is");
+
+
+                            for (int k = 0; k < size; k++)
+                            {
+                                if (k != size - 1)
+                                {
+                                    writer.WriteLine("\t\t\t\t\t\t\t\twhen {0} =>", k);
+                                }
+                                else
+                                {
+                                    writer.WriteLine("\t\t\t\t\t\t\t\twhen others =>");
+                                }
+
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\tcase addressZ is");
+
+
+                                for (int l = 0; l < depth; l++)
+                                {
+
+                                    if (l != depth - 1)
+                                    {
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
+                                    }
+                                    else
+                                    {
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                                    }
+
+                                    //string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0');
+
+                                    // temp = temp.Remove(0, -8 + temp.Length);
+
+                                    string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value));
+
+
+                                    writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput1 <= {0};", temp);
+
+
+                                }
+
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\tend case;");
+
+                            }
+                            writer.WriteLine("\t\t\t\t\t\t\tend case;");
+                        }
+                        writer.WriteLine("\t\t\t\t\tend case;");
+
+                    }
+                    writer.WriteLine("\t\t\t\t\t\tend case;");
                 }
                 else
                 {
                     writer.WriteLine("\t\t\t\twhen others =>");
-                }
 
 
-                writer.WriteLine("\t\t\t\t\tcase addressX is");
+
+                    //Save the weights into an easier data structure.
 
 
-                for (int j = 0; j < size; j++)
-                {
-                    if (j != size - 1)
+
+
+                    writer.WriteLine("\t\t\t\tcase filter is");
+
+                    int filters = Layers[layer * 2].FC.OutputSize;
+                    int size = Layers[0].Conv.FilterSize;
+                    int depth = Layers[layer * 2].FC.InputDepth;
+
+
+                    for (int i = 0; i < filters; i++)
                     {
-                        writer.WriteLine("\t\t\t\t\t\twhen {0} =>", j);
-                    }
-                    else
-                    {
-                        writer.WriteLine("\t\t\t\t\t\twhen others =>");
-                    }
+                        Fixed[,,] values = new Fixed[7, 7, 64];
 
-                    writer.WriteLine("\t\t\t\t\t\t\tcase addressY is");
+                        int counter = 0;
 
-
-                    for (int k = 0; k < size; k++)
-                    {
-                        if (k != size - 1)
+                        for (int z = 0; z < 64; z++)
                         {
-                            writer.WriteLine("\t\t\t\t\t\t\t\twhen {0} =>", k);
+                            for (int y = 0; y < 7; y++)
+                            {
+                                for (int x = 0; x < 7; x++)
+                                {
+                                    values[x, y, z] = Layers[layers.Count - 1].FC.WeightsArray[i, counter];
+                                    counter++;
+                                }
+                            }
+                        }
+
+
+
+                        Fixed[,,] values2 = new Fixed[5, 5, 64 * 4];
+
+
+
+                        for (int z = 0; z < 64 * 4; z++)
+                        {
+                            for (int y = 0; y < 5; y++)
+                            {
+                                for (int x = 0; x < 5; x++)
+                                {
+
+                                    int offsetX = 0;
+                                    int offsetY = 0;
+
+                                    if (x >= 2 && ((z >= 64 && z < 128) || (z >= 192)))
+                                    {
+                                        break;
+                                    }
+
+                                    if (y >= 2 && z >= 128)
+                                    {
+                                        break;
+                                    }
+
+                                    if (z >= 64)
+                                    {
+                                        offsetX += 5;
+                                    }
+                                    if (z >= 128)
+                                    {
+                                        offsetY += 5;
+                                        offsetX -= 5;
+                                    }
+                                    if (z >= 192)
+                                    {
+                                        offsetX += 5;
+                                    }
+
+                                    if (values2[x, y, z] != null)
+                                    {
+                                        int gfsg = 0;
+                                    }
+
+                                    values2[x, y, z] = values[x + offsetX, y + offsetY, z % 64];
+
+                                }
+                            }
+                        }
+
+
+
+
+                        if (i != filters - 1)
+                        {
+                            writer.WriteLine("\t\t\t\twhen {0} =>", i);
                         }
                         else
                         {
-                            writer.WriteLine("\t\t\t\t\t\t\t\twhen others =>");
+                            writer.WriteLine("\t\t\t\twhen others =>");
                         }
 
-                        writer.WriteLine("\t\t\t\t\t\t\t\t\tcase addressZ is");
+                        writer.WriteLine("\t\t\t\t\tcase addressX is");
 
-
-                        for (int l = 0; l < depth; l++)
+                        for (int j = 0; j < size; j++)
                         {
 
-                            if (l != depth - 1)
+
+                            if (j != size - 1)
                             {
-                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
+                                writer.WriteLine("\t\t\t\t\t\twhen {0} =>", j);
                             }
                             else
                             {
-                                writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                                writer.WriteLine("\t\t\t\t\t\twhen others =>");
                             }
 
-                            string temp = Convert.ToString((Layers[0].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0');
-
-                            temp = temp.Remove(0, -8 + temp.Length);
+                            writer.WriteLine("\t\t\t\t\t\t\tcase addressY is");
 
 
+                            for (int k = 0; k < size; k++)
+                            {
+                                if (k != size - 1)
+                                {
+                                    writer.WriteLine("\t\t\t\t\t\t\t\twhen {0} =>", k);
+                                }
+                                else
+                                {
+                                    writer.WriteLine("\t\t\t\t\t\t\t\twhen others =>");
+                                }
+
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\tcase addressZ is");
 
 
-                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
+
+                                int maxDepth = depth * 4;
+                                bool skip64 = false;
+
+                                if (k >= 2)
+                                {
+                                    maxDepth /= 2;
+                                }
+                                if (j >= 2)
+                                {
+                                    skip64 = true;
+                                    maxDepth /= 2;
+                                }
+
+                                for (int l = 0; l < maxDepth; l++)
+                                {
+                                    int lNew = l;
+
+                                    if (skip64)
+                                    {
+                                        if (l >= 64)
+                                        {
+                                            lNew += 64;
+                                        }
+                                    }
 
 
+                                    int calcdepth = 0;
+
+                                    calcdepth += lNew;
+
+                                    //calcdepth += Layers[layer * 2].FC.InputWidth * j * Layers[layer * 2].FC.InputDepth;
+
+                                    //calcdepth += Layers[layer * 2].FC.InputHeight * k * Layers[layer * 2].FC.InputDepth * size;
+
+                                    //calcdepth += j * Layers[layer * 2].FC.InputDepth;
+
+                                    //calcdepth += k * Layers[layer * 2].FC.InputDepth * Layers[layer * 2].FC.InputWidth;
+
+                                    if (false)
+                                    {//calcdepth >= Layers[layer * 2].FC.Weights / 10) {
+                                    }
+                                    else
+                                    {
+                                        bool lastElement = false;
+
+                                        lastElement |= !(l != maxDepth - 1);
+
+
+                                        if (!lastElement)
+                                        {
+                                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", lNew);
+                                        }
+                                        else
+                                        {
+                                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                                        }
+
+                                        //string temp = Convert.ToString((values2[j, k, lNew].value), 2).PadLeft(8, '0');
+                                        string temp = Convert.ToString((values2[j, k, lNew].value));
+
+                                        //temp = temp.Remove(0, -8 + temp.Length);
+
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput1 <= {0};", temp);
+                                    }
+
+                                }
+
+                                writer.WriteLine("\t\t\t\t\t\t\t\t\tend case;");
+
+                            }
+                            writer.WriteLine("\t\t\t\t\t\t\tend case;");
                         }
-
-                        writer.WriteLine("\t\t\t\t\t\t\t\t\tend case;");
+                        writer.WriteLine("\t\t\t\t\tend case;");
 
                     }
-                    writer.WriteLine("\t\t\t\t\t\t\tend case;");
+                    writer.WriteLine("\t\t\t\t\t\tend case;");
+
                 }
-                writer.WriteLine("\t\t\t\t\tend case;");
 
 
-
+                
             }
 
 
