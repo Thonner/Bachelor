@@ -90,9 +90,51 @@ namespace mnist_classification
                 }
             }
             //If one is negative and the other is positive, it will not overflow.
+            if (temp > Int16.MaxValue || temp < Int16.MinValue)
+            {
+                throw new Exception("SOMETHING WENT WRONG!");
 
+            }
             return new Fixed((short)temp);
         }
+
+
+        public static Fixed operator +(Fixed f1, Fix8 f2)
+        {/*
+            if (f1 == null)
+            {
+                return f2;
+            }*/
+
+            int temp = (f1.value + f2.value);
+
+            //If both are negative, result should be negative
+            if (f1.value < 0 && f2.value < 0)
+            {
+                if (temp < Int16.MinValue)
+                {
+                    //Underflow occured, set to min value.
+                    temp = Int16.MinValue;
+                }
+                //If both are positive, result should be positive.
+            }
+            else if (f1.value >= 0 && f2.value >= 0)
+            {
+                if (temp > Int16.MaxValue)
+                {
+                    //Overflow occured, set to max value.
+                    temp = Int16.MaxValue;
+                }
+            }
+            //If one is negative and the other is positive, it will not overflow.
+            if (temp > Int16.MaxValue || temp < Int16.MinValue)
+            {
+                throw new Exception("SOMETHING WENT WRONG!");
+
+            }
+            return new Fixed((short)temp);
+        }
+
 
         public static Fixed operator -(Fixed f1, Fixed f2)
         {
@@ -111,7 +153,7 @@ namespace mnist_classification
 
             int temp = f1.value * f2.value;
 
-            temp = temp >> right + Fix8.right - right; 
+            temp = temp >> (right + Fix8.right - right); 
 
 
             if (temp < Int16.MinValue)

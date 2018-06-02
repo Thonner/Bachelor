@@ -22,7 +22,7 @@ namespace mnist_classification
 
         public Fixed[,] WeightsArray { get; set; }
 
-        public Fixed[] Bias { get; set; }
+        public Fix8[] Bias { get; set; }
 
         public Fixed[,,] Input { get; set; }
 

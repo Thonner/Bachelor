@@ -96,7 +96,11 @@ namespace mnist_classification
                 }
             }
             //If one is negative and the other is positive, it will not overflow.
+            if(temp > SByte.MaxValue || temp < SByte.MinValue)
+            {
+                throw new Exception("SOMETHING WENT WRONG!");
 
+            }
             return new Fix8((SByte)temp);
         }
 
