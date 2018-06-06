@@ -19,7 +19,7 @@ using System.IO;
 
 
 using System.Drawing;
-
+using System.IO.Ports;
 
 namespace mnist_classification
 {
@@ -1175,6 +1175,55 @@ begin
     end process;
 end architecture;");
             writer.Close();
+        }
+
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            listView.Items.Clear();
+            string[] items = SerialPort.GetPortNames();
+            foreach (string item in items)
+            {
+                listView.Items.Add(item);
+                Console.WriteLine(item);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if(listView.SelectedItem != null)
+            {
+                SerialPort UARTPort = new SerialPort();
+                UARTPort.PortName = listView.SelectedItem.ToString();
+                UARTPort.BaudRate = 115200;
+                UARTPort.Parity = Parity.None;
+                UARTPort.DataBits = 8;
+                UARTPort.StopBits = StopBits.One;
+                UARTPort.WriteTimeout = 500;
+                UARTPort.Open();
+                short Neuron = 0x0000;
+                byte[] NeuronBytes;
+                UARTPort.Write("S"); // this is the start signal for the FPGA
+
+                for(int z = 0; z < Layers[0].Conv.InputDepth; z++)
+                {
+                    for(int y = 0; y < Layers[0].Conv.InputHeight; y++)
+                    {
+                        for(int x = 0; x < Layers[0].Conv.InputWidth; x++)
+                        {
+                            Neuron = Layers[0].Conv.Input[x, y, z].value;
+                            NeuronBytes = BitConverter.GetBytes(Neuron);
+                            UARTPort.Write(NeuronBytes, 0, 2);
+                        }
+                    }
+                }
+                UARTPort.Close();     
+
+            }
         }
     }
 }
