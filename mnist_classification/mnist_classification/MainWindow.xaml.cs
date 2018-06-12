@@ -851,10 +851,10 @@ entity weightsRom is
 end entity;
 
 architecture rtl of weightsRom is
-    variable output1 : integer;
+    --variable output1 : integer;
 begin
     
-        output <= to_signed(output1,output'length);
+        --output <= to_signed(output1,output'length);
     process(all)
     begin
 
@@ -922,24 +922,26 @@ begin
 
                                 for (int l = 0; l < depth; l++)
                                 {
+                                    writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
 
+
+                                    string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0');
+
+                                    temp = temp.Remove(0, -8 + temp.Length);
+
+                                    //string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value));
+                                    writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";", temp);
                                     if (l != depth - 1)
                                     {
-                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", l);
+
                                     }
                                     else
                                     {
                                         writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"--------\";", temp);
                                     }
 
-                                    //string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value), 2).PadLeft(8, '0');
 
-                                    // temp = temp.Remove(0, -8 + temp.Length);
-
-                                    string temp = Convert.ToString((Layers[layer * 2].Conv.FilterArray[i].Weights[j, k, l].value));
-
-
-                                    writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput1 <= {0};", temp);
 
 
                                 }
@@ -1133,22 +1135,28 @@ begin
 
                                         lastElement |= !(l != maxDepth - 1);
 
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", lNew);
+
+
+                                        string temp = Convert.ToString((values2[j, k, lNew].value), 2).PadLeft(8, '0');
+                                        //string temp = Convert.ToString((values2[j, k, lNew].value));
+
+                                        temp = temp.Remove(0, -8 + temp.Length);
+
+                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"{0}\";",temp);
 
                                         if (!lastElement)
                                         {
-                                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen {0} =>", lNew);
+
                                         }
                                         else
                                         {
                                             writer.WriteLine("\t\t\t\t\t\t\t\t\t\twhen others =>");
+
+                                            writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput <= \"--------\";");
                                         }
 
-                                        //string temp = Convert.ToString((values2[j, k, lNew].value), 2).PadLeft(8, '0');
-                                        string temp = Convert.ToString((values2[j, k, lNew].value));
 
-                                        //temp = temp.Remove(0, -8 + temp.Length);
-
-                                        writer.WriteLine("\t\t\t\t\t\t\t\t\t\t\toutput1 <= {0};", temp);
                                     }
 
                                 }
