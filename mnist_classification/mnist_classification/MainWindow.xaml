@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:mnist_classification"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
+    <Grid Margin="0,0,0,-2">
         <Button x:Name="Load_cfg_Button" Content="Load cfg" HorizontalAlignment="Left" Margin="41,26,0,0" VerticalAlignment="Top" Width="75" Click="Load_cfg_Button_Click"/>
         <Button x:Name="Load_weights_Button" Content="Load Weights" HorizontalAlignment="Left" Margin="184,26,0,0" VerticalAlignment="Top" Width="89" Click="Load_weights_Button_Click"/>
         <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Left" Height="228" Margin="41,65,0,0" VerticalAlignment="Top" Width="228">
@@ -14,11 +14,20 @@
 
             </InkCanvas>
         </Border>
-        <Button Content="Use" HorizontalAlignment="Left" Margin="419,93,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Use" HorizontalAlignment="Left" Margin="419,65,0,0" VerticalAlignment="Top" Width="75"/>
         <Button Content="LoadPic" HorizontalAlignment="Left" Margin="319,26,0,0" VerticalAlignment="Top" Width="75" Click="LoadPic_Button_Click"/>
-        <Button Name="Clear_pic_Button" Content="Clear" HorizontalAlignment="Left" Margin="419,118,0,0" VerticalAlignment="Top" Width="75" Click="Clear_pic_Button_Click"/>
+        <Button Name="Clear_pic_Button" Content="Clear" HorizontalAlignment="Left" Margin="419,90,0,0" VerticalAlignment="Top" Width="75" Click="Clear_pic_Button_Click"/>
         <Button Content="Calculate" HorizontalAlignment="Left" Margin="419,26,0,0" VerticalAlignment="Top" Width="75" Click="Calculate_Button_Click"/>
         <TextBox Name="TextBoxResult" HorizontalAlignment="Left" Height="228" Margin="289,65,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="105"/>
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="135" Margin="394,186,0,0" VerticalAlignment="Top" Width="123" SelectionChanged="ListView_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="Find COMs" HorizontalAlignment="Left" Margin="419,161,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button Content="Upload" HorizontalAlignment="Left" Margin="419,115,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>
 
     </Grid>
 </Window>
