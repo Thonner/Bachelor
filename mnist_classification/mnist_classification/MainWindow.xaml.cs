@@ -19,7 +19,7 @@ using System.IO;
 
 
 using System.Drawing;
-
+using System.Diagnostics;
 
 namespace mnist_classification
 {
@@ -28,6 +28,8 @@ namespace mnist_classification
     /// </summary>
     public partial class MainWindow : Window
     {
+
+
         private List<Layers> layers = new List<Layers>();
         public int layerCount = 0;
         public MainWindow()
@@ -499,7 +501,8 @@ namespace mnist_classification
 
         private void Calculate_Button_Click(object sender, RoutedEventArgs e)
         {
-
+            Stopwatch stopwWatch = new Stopwatch();
+            stopwWatch.Start();
 
             for (int i = 0; i < Layers.Count; i++)
             {
@@ -564,7 +567,9 @@ namespace mnist_classification
                 }
             }
 
+            stopwWatch.Stop();
 
+            Console.WriteLine("Run time: {0}", stopwWatch.ElapsedMilliseconds);
 
             StringBuilder builder = new StringBuilder();
 
