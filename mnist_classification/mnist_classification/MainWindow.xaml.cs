@@ -31,6 +31,7 @@ namespace mnist_classification
     {
         private List<Layers> layers = new List<Layers>();
         public int layerCount = 0;
+		public Dictionary<string, int> labels = new Dictionary<string, int>();
         public MainWindow()
         {
             FixedTest();
@@ -1237,5 +1238,181 @@ end architecture;");
 
             }
         }
-    }
+
+		private void ImageFolder_Clicked(object sender, RoutedEventArgs e)
+		{
+			float correct = 0.0F;
+			float totalPics = 0.0F;
+   
+			OpenFileDialog fileDialog = new OpenFileDialog();
+
+
+			fileDialog.Filter = "png Files (.png)|*.png|All Files (*.*)|*.*";
+
+			fileDialog.FilterIndex = 1;
+
+			
+			bool? userClickedOK = fileDialog.ShowDialog();
+			// Process input if the user clicked OK.
+			if (userClickedOK == true)
+			{
+				string folderPath = fileDialog.FileName.Replace("\\"+fileDialog.SafeFileName, "");
+
+				var pngs = Directory.EnumerateFiles(folderPath, "*.png");
+
+
+				Layers[0].Conv.Input = new Fixed[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
+				foreach (string thisPng in pngs)
+				{
+					totalPics++;
+					pic = new Bitmap(thisPng);
+
+					//Make room for the file
+					
+					for (int i = 0; i < Layers[0].Conv.Input.GetLength(0); i++)
+					{
+						for (int j = 0; j < Layers[0].Conv.Input.GetLength(1); j++)
+						{
+							System.Drawing.Color color = pic.GetPixel(i, j);
+
+							float red = 0, green = 0, blue = 0;
+
+
+							red = color.R / 255.0F;
+							green = color.G / 255.0F;
+							blue = color.B / 255.0F;
+
+
+
+
+							Layers[0].Conv.Input[i, j, 0] = (Fixed)red;
+							Layers[0].Conv.Input[i, j, 1] = (Fixed)green;
+							Layers[0].Conv.Input[i, j, 2] = (Fixed)blue;
+
+
+
+						}
+					}
+
+					for (int i = 0; i < Layers.Count; i++)
+					{
+						switch (Layers[i].LayerType)
+						{
+							case "Conv":
+								if (i != 0)
+								{
+									switch (Layers[i - 1].LayerType)
+									{
+										case "Max":
+											layers[i].Conv.Input = Layers[i - 1].Max.Output;
+											break;
+
+										default:
+											throw new Exception("LAYER NOT RECOGNIZED");
+											break;
+									}
+
+								}
+								Layers[i].Conv.CalcConv();
+
+								break;
+
+							case "Max":
+
+								if (Layers[i - 1].LayerType != "Conv") throw new Exception("WRONG LAYER BEFORE MAX");
+
+								Layers[i].Max.Input = Layers[i - 1].Conv.Output;
+
+								Layers[i].Max.CalcMax();
+
+								break;
+
+							case "FC":
+
+
+								switch (Layers[i - 1].LayerType)
+								{
+									case "Max":
+										Layers[i].FC.Input = Layers[i - 1].Max.Output;
+										break;
+
+									case "FC":
+										Layers[i].FC.Input = Layers[i - 1].FC.Output;
+										break;
+
+
+									default:
+										throw new Exception("LAYER NOT RECOGNIZED");
+										break;
+								}
+
+								Layers[i].FC.CalcFC();
+
+								break;
+
+
+
+							default:
+								break;
+						}
+					}
+
+
+					StringBuilder builder = new StringBuilder();
+
+					/*
+					for (int i = 0; i < 10; i++)
+					{
+						builder.AppendFormat("{0}: {1}\n", i, Layers[Layers.Count - 1].FC.Output[0, 0, i]);
+					}
+					TextBoxResult.Text = builder.ToString();
+					*/
+					int maxIndex = 0;
+					Fixed maxVal = 0;
+					for (int i = 0; i < 10; i++)
+					{
+						if (Layers[Layers.Count - 1].FC.Output[0, 0, i] > maxVal)
+						{
+							maxVal = Layers[Layers.Count - 1].FC.Output[0, 0, i];
+							maxIndex = i;
+						}
+	  ;
+					}
+
+					string searchkey = thisPng.Substring(folderPath.Length+1);
+
+					if (labels[searchkey] == maxIndex)
+					{
+						correct++;
+
+					}
+
+				}
+				float accuracy = correct/totalPics;
+				Console.WriteLine(accuracy);
+			}
+		}
+
+		private void LoadLabels_Clicked(object sender, RoutedEventArgs e)
+		{
+			OpenFileDialog fileDialog = new OpenFileDialog();
+
+			fileDialog.Filter = "txt Files (.txt)|*.txt|All Files (*.*)|*.*";
+
+			fileDialog.FilterIndex = 1;
+
+			bool? userClickedOK = fileDialog.ShowDialog();
+
+			string[] theLabels = File.ReadAllLines(fileDialog.FileName);
+
+			string test = "0";
+			int testint = Int32.Parse(test);
+
+
+			for (int i = 0; i < theLabels.Length; i++)
+			{
+				labels.Add(theLabels[i].Substring(0, theLabels[i].IndexOf(":")), Int32.Parse(theLabels[i].Substring(theLabels[i].IndexOf(":") + 2)));
+			}
+		}
+	}
 }
