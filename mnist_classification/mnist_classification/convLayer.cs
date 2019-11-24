@@ -34,9 +34,9 @@ namespace mnist_classification
 
 
         //Input and output is given as width times height times depth.
-        public Fixed[,,] Output { get; set; }
+        public Fix8[,,] Output { get; set; }
 
-        public Fixed[,,] Input { get; set; }
+        public Fix8[,,] Input { get; set; }
 
 
 
@@ -46,10 +46,10 @@ namespace mnist_classification
         public void CalcConv()
         {
 
-            Output = new Fixed[OutputWidth, OutputHeight, OutputDepth];
+            Output = new Fix8[OutputWidth, OutputHeight, OutputDepth];
 
-            //Part of the array, used for convolution.
-            Fixed[,,] part = new Fixed[FilterSize, FilterSize, InputDepth];
+			//Part of the array, used for convolution.
+			Fix8[,,] part = new Fix8[FilterSize, FilterSize, InputDepth];
 
 
             for (int i = 0; i < InputWidth; i += Stride)
@@ -75,15 +75,15 @@ namespace mnist_classification
             }
         }
 
-        private Fixed Max(Fixed a, Fixed b)
+        private Fix8 Max(Fix8 a, Fix8 b)
         {
             if (a > b) return a;
             return b;
         }
 
-        private Fixed MultFilter(Filter filter, Fixed[,,] part)
+        private Fix8 MultFilter(Filter filter, Fix8[,,] part)
         {
-            Fixed sum = 0;
+			Fix8 sum = 0;
 
             for(int i = 0; i< filter.Depth; i++)
             {
@@ -98,7 +98,7 @@ namespace mnist_classification
             return sum;
         }
 
-        private void FillPart(Fixed[,,] part, int i, int j)
+        private void FillPart(Fix8[,,] part, int i, int j)
         {
             //Fill temp array with values.
             for (int n = 0; n < FilterSize; n++)
@@ -107,7 +107,7 @@ namespace mnist_classification
                 {
                     for (int k = 0; k < InputDepth; k++)
                     {
-                        Fixed temp = 0;
+						Fix8 temp = 0;
 
                         if (n + i >= InputWidth) {
                             temp = 0;

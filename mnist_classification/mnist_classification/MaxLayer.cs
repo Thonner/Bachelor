@@ -27,18 +27,18 @@ namespace mnist_classification
 
 
         //Input and output is given as width times height times depth.
-        public Fixed[,,] Output { get; set; }
+        public Fix8[,,] Output { get; set; }
 
-        public Fixed[,,] Input { get; set; }
+        public Fix8[,,] Input { get; set; }
 
 
 
         public void CalcMax()
         {
 
-            Output = new Fixed[OutputWidth,OutputHeight,OutputDepth];
+            Output = new Fix8[OutputWidth,OutputHeight,OutputDepth];
 
-            Fixed[,] part = new Fixed[Size, Size];
+			Fix8[,] part = new Fix8[Size, Size];
 
             for (int k = 0; k < InputDepth; k++)
             {
@@ -54,9 +54,9 @@ namespace mnist_classification
             }
         }
 
-        private Fixed Max(Fixed[,] part)
+        private Fix8 Max(Fix8[,] part)
         {
-            Fixed max = 0;
+			Fix8 max = 0;
 
 
 
@@ -76,7 +76,7 @@ namespace mnist_classification
             return max;
         }
 
-        private void FillPart(Fixed[,] part, int i, int j, int k)
+        private void FillPart(Fix8[,] part, int i, int j, int k)
         {
             //Fill temp array with values.
             for (int n = 0; n < Size; n++)

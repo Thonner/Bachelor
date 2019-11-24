@@ -20,20 +20,20 @@ namespace mnist_classification
 
         public int Weights { get; set; }
 
-        public Fixed[,] WeightsArray { get; set; }
+        public Fix8[,] WeightsArray { get; set; }
 
         public Fix8[] Bias { get; set; }
 
-        public Fixed[,,] Input { get; set; }
+        public Fix8[,,] Input { get; set; }
 
-        public Fixed[,,] Output { get; set; }
+        public Fix8[,,] Output { get; set; }
 
 
 
         public void CalcFC()
         {
 
-            Output = new Fixed[1, 1, OutputSize];
+            Output = new Fix8[1, 1, OutputSize];
 
 
 
@@ -58,7 +58,7 @@ namespace mnist_classification
             }
         }
 
-        private Fixed Max(Fixed v1, Fixed v2)
+        private Fix8 Max(Fix8 v1, Fix8 v2)
         {
             if (v1 > v2) return v1;
             return v2;

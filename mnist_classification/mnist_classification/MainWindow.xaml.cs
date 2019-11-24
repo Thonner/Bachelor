@@ -307,7 +307,7 @@ namespace mnist_classification
 
                                     Layers[layerCount - 1].FC.Weights = Layers[layerCount - 2].Conv.OutputWidth * Layers[layerCount - 2].Conv.OutputHeight * Layers[layerCount - 2].Conv.OutputDepth * Layers[layerCount - 1].FC.OutputSize;
 
-                                    Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
+                                    Layers[layerCount - 1].FC.WeightsArray = new Fix8[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
 
                                     Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
                                     break;
@@ -319,7 +319,7 @@ namespace mnist_classification
 
                                     Layers[layerCount - 1].FC.Weights = Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.OutputSize;
 
-                                    Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputHeight];
+                                    Layers[layerCount - 1].FC.WeightsArray = new Fix8[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputHeight];
 
                                     Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
 
@@ -332,7 +332,7 @@ namespace mnist_classification
 
                                     Layers[layerCount - 1].FC.Weights = Layers[layerCount - 2].Max.OutputWidth * Layers[layerCount - 2].Max.OutputHeight * Layers[layerCount - 2].Max.OutputDepth * Layers[layerCount - 1].FC.OutputSize;
 
-                                    Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
+                                    Layers[layerCount - 1].FC.WeightsArray = new Fix8[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
                                     Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
 
                                     break;
@@ -431,7 +431,7 @@ namespace mnist_classification
                             {
                                 for(int inputs = 0; inputs < Layers[i].FC.InputDepth* Layers[i].FC.InputHeight* Layers[i].FC.InputWidth; inputs++)
                                 {
-                                    Layers[i].FC.WeightsArray[outputs, inputs] = (Fixed)br.ReadSingle();
+                                    Layers[i].FC.WeightsArray[outputs, inputs] = (Fix8)br.ReadSingle();
                                 }
                             }
 
@@ -467,7 +467,7 @@ namespace mnist_classification
                 pic = new Bitmap(fileDialog.FileName);
 
                 //Make room for the file
-                Layers[0].Conv.Input = new Fixed[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
+                Layers[0].Conv.Input = new Fix8[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
 
             
 
@@ -489,9 +489,9 @@ namespace mnist_classification
 
 
 
-                        Layers[0].Conv.Input[i, j, 0] = (Fixed)red;
-                        Layers[0].Conv.Input[i, j, 1] = (Fixed)green;
-                        Layers[0].Conv.Input[i, j, 2] = (Fixed)blue;
+                        Layers[0].Conv.Input[i, j, 0] = (Fix8)red;
+                        Layers[0].Conv.Input[i, j, 1] = (Fix8)green;
+                        Layers[0].Conv.Input[i, j, 2] = (Fix8)blue;
 
 
 
@@ -981,7 +981,7 @@ begin
 
                     for (int i = 0; i < filters; i++)
                     {
-                        Fixed[,,] values = new Fixed[7, 7, 64];
+						Fix8[,,] values = new Fix8[7, 7, 64];
 
                         int counter = 0;
 
@@ -999,7 +999,7 @@ begin
 
 
 
-                        Fixed[,,] values2 = new Fixed[5, 5, 64 * 4];
+						Fix8[,,] values2 = new Fix8[5, 5, 64 * 4];
 
 
 
@@ -1261,7 +1261,7 @@ end architecture;");
 				var pngs = Directory.EnumerateFiles(folderPath, "*.png");
 
 
-				Layers[0].Conv.Input = new Fixed[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
+				Layers[0].Conv.Input = new Fix8[Layers[0].Conv.InputWidth, Layers[0].Conv.InputHeight, Layers[0].Conv.InputDepth]; //Testing next line
 				foreach (string thisPng in pngs)
 				{
 					totalPics++;
@@ -1285,9 +1285,9 @@ end architecture;");
 
 
 
-							Layers[0].Conv.Input[i, j, 0] = (Fixed)red;
-							Layers[0].Conv.Input[i, j, 1] = (Fixed)green;
-							Layers[0].Conv.Input[i, j, 2] = (Fixed)blue;
+							Layers[0].Conv.Input[i, j, 0] = (Fix8)red;
+							Layers[0].Conv.Input[i, j, 1] = (Fix8)green;
+							Layers[0].Conv.Input[i, j, 2] = (Fix8)blue;
 
 
 
@@ -1368,7 +1368,7 @@ end architecture;");
 					TextBoxResult.Text = builder.ToString();
 					*/
 					int maxIndex = 0;
-					Fixed maxVal = 0;
+					Fix8 maxVal = 0;
 					for (int i = 0; i < 10; i++)
 					{
 						if (Layers[Layers.Count - 1].FC.Output[0, 0, i] > maxVal)

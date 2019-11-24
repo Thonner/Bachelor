@@ -16,10 +16,10 @@ namespace mnist_classification
         // FORM:
         // s.ssXXXXXXX
         // Where s it MSB, the two zeroes are implied and the seven X are the lower 7 bits.
-        public const int right = 9;
-        public const int left = 1;
+        public const int right = 4;
+        public const int left = 4;
 
-        const int multiplier = 512; //2^right;
+        const int multiplier = 16; //2^right;
 
         private Fix8(SByte value)
         {
