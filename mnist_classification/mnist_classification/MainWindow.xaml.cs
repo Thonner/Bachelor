@@ -218,7 +218,7 @@ namespace mnist_classification
                                 {
                                     case "fil":
                                         Layers[layerCount - 1].Conv.Filters = Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1));
-                                        Layers[layerCount - 1].Conv.Bias = new Fix8[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
+                                        Layers[layerCount - 1].Conv.Bias = new Fixed[Int32.Parse(tempString.Substring(tempString.IndexOf('=') + 1))];
                                         break;
 
                                     case "siz":
@@ -260,7 +260,7 @@ namespace mnist_classification
                                     Layers[layerCount - 1].Conv.FilterArray[i].Depth = Layers[layerCount - 1].Conv.InputDepth;
                                 }
                                 //Layers[layerCount - 1].Conv.FilterArray[i].Depth = ?? should be calculated from preveos layer
-                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new Fix8[Layers[layerCount - 1].Conv.FilterArray[i].Height, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Depth];
+                                Layers[layerCount - 1].Conv.FilterArray[i].Weights = new Fixed[Layers[layerCount - 1].Conv.FilterArray[i].Height, Layers[layerCount - 1].Conv.FilterArray[i].Width, Layers[layerCount - 1].Conv.FilterArray[i].Depth];
 
                             }
 
@@ -309,7 +309,7 @@ namespace mnist_classification
 
                                     Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
 
-                                    Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
+                                    Layers[layerCount - 1].FC.Bias = new Fixed[Layers[layerCount - 1].FC.OutputSize];
                                     break;
 
                                 case "FC":
@@ -321,7 +321,7 @@ namespace mnist_classification
 
                                     Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputHeight];
 
-                                    Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
+                                    Layers[layerCount - 1].FC.Bias = new Fixed[Layers[layerCount - 1].FC.OutputSize];
 
                                     break;
 
@@ -333,7 +333,7 @@ namespace mnist_classification
                                     Layers[layerCount - 1].FC.Weights = Layers[layerCount - 2].Max.OutputWidth * Layers[layerCount - 2].Max.OutputHeight * Layers[layerCount - 2].Max.OutputDepth * Layers[layerCount - 1].FC.OutputSize;
 
                                     Layers[layerCount - 1].FC.WeightsArray = new Fixed[Layers[layerCount - 1].FC.OutputSize, Layers[layerCount - 1].FC.InputWidth * Layers[layerCount - 1].FC.InputHeight * Layers[layerCount - 1].FC.InputDepth];
-                                    Layers[layerCount - 1].FC.Bias = new Fix8[Layers[layerCount - 1].FC.OutputSize];
+                                    Layers[layerCount - 1].FC.Bias = new Fixed[Layers[layerCount - 1].FC.OutputSize];
 
                                     break;
 
@@ -399,7 +399,7 @@ namespace mnist_classification
                             
                             for(int j = 0; j < Layers[i].Conv.Filters; j++)
                             {
-                                Layers[i].Conv.Bias[j] =(Fix8) br.ReadSingle();
+                                Layers[i].Conv.Bias[j] =(Fixed) br.ReadSingle();
                             }
 
                             
@@ -413,7 +413,7 @@ namespace mnist_classification
                                     {
                                         for (int filterX = 0; filterX < Layers[i].Conv.FilterSize; filterX++)
                                         {
-                                            Layers[i].Conv.FilterArray[filterNr].Weights[filterX, filterY, filterZ] = (Fix8) br.ReadSingle();
+                                            Layers[i].Conv.FilterArray[filterNr].Weights[filterX, filterY, filterZ] = (Fixed) br.ReadSingle();
                                         }
                                     }
                                 }
@@ -424,7 +424,7 @@ namespace mnist_classification
 
                             for(int bias = 0; bias < Layers[i].FC.OutputSize; bias++)
                             {
-                                Layers[i].FC.Bias[bias] = (Fix8)br.ReadSingle();
+                                Layers[i].FC.Bias[bias] = (Fixed)br.ReadSingle();
                             }
                             
                             for(int outputs = 0; outputs < Layers[i].FC.OutputSize; outputs++)
