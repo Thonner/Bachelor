@@ -1388,7 +1388,7 @@ end architecture;");
 					}
 
 				}
-				6455float accuracy = correct/totalPics;
+				float accuracy = correct/totalPics;
 				Console.WriteLine(accuracy);
 			}
 		}
