@@ -11,10 +11,10 @@ namespace mnist_classification
     {
         public short value;
 
-        public const int right = 8; //10
-        public const int left = 8; //6
+        public const int right = 12; //10
+        public const int left = 4; //6
 
-        const int multiplier = 256; //2^right;
+        const int multiplier = 4096; //2^right;
 
         private Fixed(short value)
         {
